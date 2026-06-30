@@ -6,12 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "node scripts/seed.mjs"
   },
   "dependencies": {
+    "framer-motion": "^12.42.0",
+    "lucide-react": "^1.21.0",
+    "mongoose": "^9.6.2",
     "next": "16.2.6",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "styled-jsx": "^5.1.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
