@@ -481,11 +481,11 @@ export default function BookingModal({ onClose }) {
                 type="submit"
                 onClick={handleSubmit}
                 disabled={isSubmitting || !cardNumber || !cardHolder || !cardExpiry || !cardCvv}
-                className="bg-gold disabled:opacity-50 text-[#070708] text-[10px] font-bold uppercase tracking-widest px-6 py-3 transition-all flex items-center justify-center gap-2 hover:bg-[#bfa232] w-full md:w-auto cursor-pointer shadow-lg shadow-gold/10"
+                className="bg-gold disabled:opacity-50 text-obsidian text-[10px] font-bold uppercase tracking-widest px-6 py-3 transition-all flex items-center justify-center gap-2 hover:bg-[#bfa232] w-full md:w-auto cursor-pointer shadow-lg shadow-gold/10"
               >
                 {isSubmitting ? (
                   <>
-                    <div className="w-3 h-3 border-2 border-[#070708] border-t-transparent rounded-full animate-spin" />
+                    <div className="w-3 h-3 border-2 border-obsidian border-t-transparent rounded-full animate-spin" />
                     Securing Stay...
                   </>
                 ) : (
@@ -569,7 +569,7 @@ export default function BookingModal({ onClose }) {
               </span>
             </div>
             <span className="text-[9px] text-[#a19f9a] uppercase tracking-widest font-semibold font-mono">
-              PKR Currency
+              PKR Currency 
             </span>
           </div>
         </div>
