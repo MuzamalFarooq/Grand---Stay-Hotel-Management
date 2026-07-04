@@ -262,7 +262,7 @@ export default function ExtraSections() {
                     </div>
                     <div>
                       <p className="text-[9px] uppercase tracking-widest text-slate-500 font-semibold">Address</p>
-                      <p className="text-xs text-white font-medium">102 Royal Palm Drive, Marina Cliff, Clifton, Karachi</p>
+                      <p className="text-xs text-white font-medium">Johar Town,Lahore,Pakistan</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -271,7 +271,7 @@ export default function ExtraSections() {
                     </div>
                     <div>
                       <p className="text-[9px] uppercase tracking-widest text-slate-500 font-semibold">Contact Desk</p>
-                      <p className="text-xs text-white font-medium">+92 21 111-GRAND-S</p>
+                      <p className="text-xs text-white font-medium">+92 3067774327</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
@@ -279,8 +279,8 @@ export default function ExtraSections() {
                       <Mail className="w-4 h-4" />
                     </div>
                     <div>
-                      <p className="text-[9px] uppercase tracking-widest text-slate-500 font-semibold">Concierge Email</p>
-                      <p className="text-xs text-white font-medium">concierge@grandstay.com</p>
+                      <p className="text-[9px] uppercase tracking-widest text-slate-500 font-semibold">Email</p>
+                      <p className="text-xs text-white font-medium">muzamalfarooq111@gmail.com</p>
                     </div>
                   </div>
                 </div>
@@ -295,7 +295,7 @@ export default function ExtraSections() {
                         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
                       </svg>
                     ),
-                    href: "#",
+                    href: "https://www.facebook.com/tigerstyle786.M",
                   },
                   {
                     icon: (
@@ -305,7 +305,7 @@ export default function ExtraSections() {
                         <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                       </svg>
                     ),
-                    href: "#",
+                    href: "https://www.instagram.com/tigerstyle786",
                   },
                   {
                     icon: (
@@ -313,7 +313,7 @@ export default function ExtraSections() {
                         <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
                       </svg>
                     ),
-                    href: "#",
+                    href: "https://www.linkedin.com/in/muzamal-farooq-1232693a9",
                   },
                 ].map((s, idx) => (
                   <a
