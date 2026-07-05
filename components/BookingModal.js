@@ -35,6 +35,7 @@ export default function BookingModal({ onClose }) {
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCvv, setCardCvv] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("card"); // "card" | "reception"
   // Store a snapshot of the room and booking data for the confirmation screen,
   // so it survives even if selectedRoom gets cleared from context.
   const [confirmedData, setConfirmedData] = useState(null);
@@ -84,12 +85,13 @@ export default function BookingModal({ onClose }) {
       checkOutDate,
       guests,
       grandTotal,
+      paymentMethod,
     };
 
     // Mimic processing delay
     setTimeout(async () => {
       try {
-        const result = await handleBookRoom();
+        const result = await handleBookRoom(paymentMethod === "card" ? "Paid" : "Unpaid");
         if (result) {
           setConfirmedData({ ...snapshot, bookingId: result.bookingId });
           setStep(4);
@@ -333,99 +335,159 @@ export default function BookingModal({ onClose }) {
                   className="space-y-6"
                 >
                   <h4 className="text-sm font-serif text-white uppercase tracking-widest border-b border-slate-900 pb-2">
-                    Guaranteed Payment
+                    Payment Method
                   </h4>
 
-                  {/* Visual Premium Card mockup */}
-                  <div className="w-full h-40 bg-gradient-to-br from-slate-900 to-black border border-gold/20 p-6 flex flex-col justify-between shadow-lg relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-28 h-28 bg-gold/5 rounded-full blur-3xl pointer-events-none" />
-                    <div className="flex justify-between items-start">
-                      <span className="text-[10px] tracking-[0.2em] font-serif text-gold">GRAND STAY PLATINUM</span>
-                      <CreditCard className="w-8 h-8 text-gold" />
-                    </div>
-                    <div>
-                      <p className="text-sm tracking-[0.15em] font-mono text-white">
-                        {cardNumber ? cardNumber : "•••• •••• •••• ••••"}
-                      </p>
-                    </div>
-                    <div className="flex justify-between items-end">
-                      <div>
-                        <p className="text-[7px] text-slate-500 uppercase tracking-widest">Card Holder</p>
-                        <p className="text-[10px] uppercase font-mono text-gold truncate max-w-[150px]">
-                          {cardHolder ? cardHolder : "Valued Member"}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-[7px] text-slate-500 uppercase tracking-widest text-right">Expires</p>
-                        <p className="text-[10px] font-mono text-gold text-right">
-                          {cardExpiry ? cardExpiry : "MM/YY"}
-                        </p>
-                      </div>
-                    </div>
+                  {/* Payment Method Toggle */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("card")}
+                      className={`flex flex-col items-center gap-2 p-4 border transition-all duration-300 ${
+                        paymentMethod === "card"
+                          ? "border-gold bg-gold/10 text-gold"
+                          : "border-slate-800 bg-[#070708] text-slate-500 hover:border-slate-600"
+                      }`}
+                    >
+                      <CreditCard className="w-6 h-6" />
+                      <span className="text-[10px] font-bold uppercase tracking-widest">Pay by Card</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod("reception")}
+                      className={`flex flex-col items-center gap-2 p-4 border transition-all duration-300 ${
+                        paymentMethod === "reception"
+                          ? "border-gold bg-gold/10 text-gold"
+                          : "border-slate-800 bg-[#070708] text-slate-500 hover:border-slate-600"
+                      }`}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                      <span className="text-[10px] font-bold uppercase tracking-widest">Pay at Reception</span>
+                    </button>
                   </div>
 
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-[9px] uppercase tracking-widest text-[#a19f9a] font-semibold">
-                          Card Number
-                        </label>
-                        <input
-                          type="text"
-                          maxLength="19"
-                          required
-                          placeholder="4000 1234 5678 9010"
-                          value={cardNumber}
-                          onChange={(e) => setCardNumber(e.target.value.replace(/[^\d\s]/g, ""))}
-                          className="bg-[#070708] border border-slate-900 focus:border-gold py-2.5 px-3 text-xs text-white focus:outline-none w-full"
-                        />
+                  {/* Card Payment Form */}
+                  {paymentMethod === "card" && (
+                    <>
+                      {/* Visual Premium Card mockup */}
+                      <div className="w-full h-40 bg-gradient-to-br from-slate-900 to-black border border-gold/20 p-6 flex flex-col justify-between shadow-lg relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-28 h-28 bg-gold/5 rounded-full blur-3xl pointer-events-none" />
+                        <div className="flex justify-between items-start">
+                          <span className="text-[10px] tracking-[0.2em] font-serif text-gold">GRAND STAY PLATINUM</span>
+                          <CreditCard className="w-8 h-8 text-gold" />
+                        </div>
+                        <div>
+                          <p className="text-sm tracking-[0.15em] font-mono text-white">
+                            {cardNumber ? cardNumber : "•••• •••• •••• ••••"}
+                          </p>
+                        </div>
+                        <div className="flex justify-between items-end">
+                          <div>
+                            <p className="text-[7px] text-slate-500 uppercase tracking-widest">Card Holder</p>
+                            <p className="text-[10px] uppercase font-mono text-gold truncate max-w-[150px]">
+                              {cardHolder ? cardHolder : "Valued Member"}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[7px] text-slate-500 uppercase tracking-widest text-right">Expires</p>
+                            <p className="text-[10px] font-mono text-gold text-right">
+                              {cardExpiry ? cardExpiry : "MM/YY"}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-[9px] uppercase tracking-widest text-[#a19f9a] font-semibold">
-                          Cardholder Name
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          placeholder="e.g. ROBERT STERLING"
-                          value={cardHolder}
-                          onChange={(e) => setCardHolder(e.target.value)}
-                          className="bg-[#070708] border border-slate-900 focus:border-gold py-2.5 px-3 text-xs text-white focus:outline-none w-full"
-                        />
-                      </div>
-                    </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-[9px] uppercase tracking-widest text-[#a19f9a] font-semibold">
-                          Expiration Date
-                        </label>
-                        <input
-                          type="text"
-                          maxLength="5"
-                          required
-                          placeholder="MM/YY"
-                          value={cardExpiry}
-                          onChange={(e) => setCardExpiry(e.target.value)}
-                          className="bg-[#070708] border border-slate-900 focus:border-gold py-2.5 px-3 text-xs text-white focus:outline-none w-full"
-                        />
+                      <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-[9px] uppercase tracking-widest text-[#a19f9a] font-semibold">
+                              Card Number
+                            </label>
+                            <input
+                              type="text"
+                              maxLength="19"
+                              placeholder="4000 1234 5678 9010"
+                              value={cardNumber}
+                              onChange={(e) => setCardNumber(e.target.value.replace(/[^\d\s]/g, ""))}
+                              className="bg-[#070708] border border-slate-900 focus:border-gold py-2.5 px-3 text-xs text-white focus:outline-none w-full"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-[9px] uppercase tracking-widest text-[#a19f9a] font-semibold">
+                              Cardholder Name
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="e.g. ROBERT STERLING"
+                              value={cardHolder}
+                              onChange={(e) => setCardHolder(e.target.value)}
+                              className="bg-[#070708] border border-slate-900 focus:border-gold py-2.5 px-3 text-xs text-white focus:outline-none w-full"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-[9px] uppercase tracking-widest text-[#a19f9a] font-semibold">
+                              Expiration Date
+                            </label>
+                            <input
+                              type="text"
+                              maxLength="5"
+                              placeholder="MM/YY"
+                              value={cardExpiry}
+                              onChange={(e) => setCardExpiry(e.target.value)}
+                              className="bg-[#070708] border border-slate-900 focus:border-gold py-2.5 px-3 text-xs text-white focus:outline-none w-full"
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1.5">
+                            <label className="text-[9px] uppercase tracking-widest text-[#a19f9a] font-semibold">
+                              Security Code (CVV)
+                            </label>
+                            <input
+                              type="password"
+                              maxLength="3"
+                              placeholder="•••"
+                              value={cardCvv}
+                              onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ""))}
+                              className="bg-[#070708] border border-slate-900 focus:border-gold py-2.5 px-3 text-xs text-white focus:outline-none w-full"
+                            />
+                          </div>
+                        </div>
+                      </form>
+                    </>
+                  )}
+
+                  {/* Pay at Reception Info */}
+                  {paymentMethod === "reception" && (
+                    <div className="p-5 bg-gold/5 border border-gold/20 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center text-gold shrink-0">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                        </div>
+                        <div>
+                          <p className="text-[11px] font-bold text-gold uppercase tracking-widest">Pay at Reception</p>
+                          <p className="text-[10px] text-[#a19f9a] mt-0.5 leading-relaxed">
+                            Your room is reserved. Complete payment at the front desk upon arrival.
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-[9px] uppercase tracking-widest text-[#a19f9a] font-semibold">
-                          Security Code (CVV)
-                        </label>
-                        <input
-                          type="password"
-                          maxLength="3"
-                          required
-                          placeholder="•••"
-                          value={cardCvv}
-                          onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ""))}
-                          className="bg-[#070708] border border-slate-900 focus:border-gold py-2.5 px-3 text-xs text-white focus:outline-none w-full"
-                        />
+                      <div className="border-t border-gold/10 pt-3 space-y-1.5">
+                        <div className="flex justify-between text-[10px]">
+                          <span className="text-slate-500 uppercase tracking-wider">Reservation Status</span>
+                          <span className="text-emerald-400 font-bold">✓ Confirmed</span>
+                        </div>
+                        <div className="flex justify-between text-[10px]">
+                          <span className="text-slate-500 uppercase tracking-wider">Payment Due</span>
+                          <span className="text-gold font-bold">At Check-In</span>
+                        </div>
+                        <div className="flex justify-between text-[10px]">
+                          <span className="text-slate-500 uppercase tracking-wider">Accepted Methods</span>
+                          <span className="text-white font-bold">Cash · Card · Transfer</span>
+                        </div>
                       </div>
                     </div>
-                  </form>
+                  )}
                 </motion.div>
               )}
 
@@ -470,7 +532,7 @@ export default function BookingModal({ onClose }) {
                       <span className="text-white font-bold">{confirmedData.checkOutDate}</span>
                     </div>
                     <div className="flex justify-between text-[10px] text-[#D4AF37] uppercase tracking-wider pt-2 border-t border-slate-900 font-bold">
-                      <span>Total Paid:</span>
+                      <span>{confirmedData.paymentMethod === "reception" ? "Total Due (at Reception):" : "Total Paid:"}</span>
                       <span>Rs {confirmedData.grandTotal.toLocaleString()}</span>
                     </div>
                   </div>
@@ -506,7 +568,10 @@ export default function BookingModal({ onClose }) {
               <button
                 type="submit"
                 onClick={handleSubmit}
-                disabled={isSubmitting || !cardNumber || !cardHolder || !cardExpiry || !cardCvv}
+                disabled={
+                  isSubmitting ||
+                  (paymentMethod === "card" && (!cardNumber || !cardHolder || !cardExpiry || !cardCvv))
+                }
                 className="bg-gold disabled:opacity-50 text-obsidian text-[10px] font-bold uppercase tracking-widest px-6 py-3 transition-all flex items-center justify-center gap-2 hover:bg-[#bfa232] w-full md:w-auto cursor-pointer shadow-lg shadow-gold/10"
               >
                 {isSubmitting ? (
@@ -516,7 +581,7 @@ export default function BookingModal({ onClose }) {
                   </>
                 ) : (
                   <>
-                    Guarantee Stay <CheckCircle className="w-3.5 h-3.5" />
+                    {paymentMethod === "reception" ? "Confirm Reservation" : "Guarantee Stay"} <CheckCircle className="w-3.5 h-3.5" />
                   </>
                 )}
               </button>

@@ -77,7 +77,7 @@ export const BookingProvider = ({ children }) => {
     setSelectedRoom(null);
   };
 
-  const handleBookRoom = async () => {
+  const handleBookRoom = async (paymentStatus = "Paid") => {
     if (!customerName || !selectedRoom || !phoneNumber || !checkInDate || !checkOutDate) return false;
 
     try {
@@ -96,7 +96,7 @@ export const BookingProvider = ({ children }) => {
           checkOutDate,
           guests,
           specialRequests,
-          paymentStatus: "Paid",
+          paymentStatus,
         }),
       });
 
