@@ -104,8 +104,10 @@ export const BookingProvider = ({ children }) => {
       if (data.success) {
         await fetchRooms();
         await fetchBookings();
-        resetBookingForm();
-        return true;
+        // NOTE: Do NOT call resetBookingForm() here.
+        // The caller (BookingModal / admin) decides when to reset,
+        // so selectedRoom stays available for the confirmation screen.
+        return data.data; // return the saved booking object (truthy)
       }
       alert(data.error || "Failed to save booking");
       return false;
@@ -288,6 +290,7 @@ export const BookingProvider = ({ children }) => {
     handleEditRoom,
     handleDeleteRoom,
     handleMarkAvailable,
+    resetBookingForm,
     fetchRooms,
     fetchBookings,
     availableRoomsCount,

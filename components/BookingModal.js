@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useBooking } from "@/context/BookingContext";
 import { X, Calendar, User, CreditCard, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
@@ -23,6 +23,7 @@ export default function BookingModal({ onClose }) {
     checkOutDate,
     setCheckOutDate,
     handleBookRoom,
+    resetBookingForm,
     today,
     threeDaysLater
   } = useBooking();
@@ -33,17 +34,27 @@ export default function BookingModal({ onClose }) {
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCvv, setCardCvv] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Store a snapshot of the room and booking data for the confirmation screen,
+  // so it survives even if selectedRoom gets cleared from context.
+  const [confirmedData, setConfirmedData] = useState(null);
+  const roomSnapshot = useRef(null);
 
-  // Reset fields on mount
+  // Reset fields on mount and snapshot the room
   useEffect(() => {
     setCustomerName("");
+    setEmail("");
     setIdCard("");
     setPhoneNumber("");
     setCheckInDate(today);
     setCheckOutDate(threeDaysLater);
+    if (selectedRoom) {
+      roomSnapshot.current = { ...selectedRoom };
+    }
   }, []);
 
-  if (!selectedRoom) return null;
+  // Use the snapshot if selectedRoom has been cleared (e.g. after booking)
+  const room = selectedRoom || roomSnapshot.current;
+  if (!room) return null;
 
   // Calculate nights and price
   const start = new Date(checkInDate);
@@ -51,7 +62,7 @@ export default function BookingModal({ onClose }) {
   const timeDiff = end.getTime() - start.getTime();
   const nightCount = Math.max(Math.ceil(timeDiff / (1000 * 3600 * 24)), 1);
 
-  const subtotal = selectedRoom.price * nightCount;
+  const subtotal = room.price * nightCount;
   const resortFee = Math.round(subtotal * 0.05);
   const vatTax = Math.round(subtotal * 0.10);
   const grandTotal = subtotal + resortFee + vatTax;
@@ -63,11 +74,25 @@ export default function BookingModal({ onClose }) {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Snapshot current form data for the confirmation screen
+    const snapshot = {
+      room: { ...room },
+      customerName,
+      email,
+      checkInDate,
+      checkOutDate,
+      guests,
+      grandTotal,
+    };
+
     // Mimic processing delay
     setTimeout(async () => {
       try {
-        const success = await handleBookRoom();
-        if (success) setStep(4);
+        const result = await handleBookRoom();
+        if (result) {
+          setConfirmedData({ ...snapshot, bookingId: result.bookingId });
+          setStep(4);
+        }
       } catch (err) {
         console.error(err);
         alert("There was an issue processing your booking.");
@@ -92,7 +117,7 @@ export default function BookingModal({ onClose }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
-        onClick={step === 4 ? onClose : undefined}
+        onClick={step === 4 ? () => { resetBookingForm(); onClose(); } : undefined}
       />
 
       {/* Modal Container */}
@@ -122,7 +147,7 @@ export default function BookingModal({ onClose }) {
                 Luxury Suite Reservation
               </span>
               <h3 className="text-2xl font-serif text-white tracking-wide">
-                Room #{selectedRoom.id}
+                Room #{room.id}
               </h3>
             </div>
 
@@ -403,7 +428,7 @@ export default function BookingModal({ onClose }) {
                 </motion.div>
               )}
 
-              {step === 4 && (
+              {step === 4 && confirmedData && (
                 <motion.div
                   key="step4"
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -429,23 +454,23 @@ export default function BookingModal({ onClose }) {
                   <div className="p-5 border border-gold/15 bg-gold-muted/5 inline-block text-left max-w-sm w-full mx-auto">
                     <div className="flex justify-between text-[10px] text-slate-500 uppercase tracking-wider mb-2">
                       <span>Confirmation No:</span>
-                      <span className="text-white font-mono font-bold">REZ-GS{selectedRoom.id}x9B</span>
+                      <span className="text-white font-mono font-bold">{confirmedData.bookingId || `REZ-GS${confirmedData.room.id}x9B`}</span>
                     </div>
                     <div className="flex justify-between text-[10px] text-slate-500 uppercase tracking-wider mb-2">
                       <span>Suite Reserved:</span>
-                      <span className="text-gold font-bold">Luxury {selectedRoom.type} Suite</span>
+                      <span className="text-gold font-bold">Luxury {confirmedData.room.type} Suite</span>
                     </div>
                     <div className="flex justify-between text-[10px] text-slate-500 uppercase tracking-wider mb-2">
                       <span>Check-In:</span>
-                      <span className="text-white font-bold">{checkInDate}</span>
+                      <span className="text-white font-bold">{confirmedData.checkInDate}</span>
                     </div>
                     <div className="flex justify-between text-[10px] text-slate-500 uppercase tracking-wider mb-2">
                       <span>Check-Out:</span>
-                      <span className="text-white font-bold">{checkOutDate}</span>
+                      <span className="text-white font-bold">{confirmedData.checkOutDate}</span>
                     </div>
                     <div className="flex justify-between text-[10px] text-[#D4AF37] uppercase tracking-wider pt-2 border-t border-slate-900 font-bold">
                       <span>Total Paid:</span>
-                      <span>Rs {grandTotal.toLocaleString()}</span>
+                      <span>Rs {confirmedData.grandTotal.toLocaleString()}</span>
                     </div>
                   </div>
                 </motion.div>
@@ -497,7 +522,7 @@ export default function BookingModal({ onClose }) {
             ) : (
               <button
                 type="button"
-                onClick={onClose}
+                onClick={() => { resetBookingForm(); onClose(); }}
                 className="w-full bg-[#1c1c22] border border-slate-800 text-gold text-[10px] font-bold uppercase tracking-widest py-3 text-center transition-all hover:bg-gold hover:text-[#070708] cursor-pointer"
               >
                 Return to Directory
@@ -524,12 +549,12 @@ export default function BookingModal({ onClose }) {
                 />
               </div>
               <div>
-                <p className="text-xs font-serif text-white font-bold leading-tight">
-                  Luxury {selectedRoom.type} Suite
-                </p>
-                <p className="text-[9px] uppercase tracking-widest text-[#a19f9a] mt-1">
-                  Property Unit #{selectedRoom.id}
-                </p>
+                  <span className="text-xs font-serif text-white font-bold leading-tight">
+                    Luxury {room.type} Suite
+                  </span>
+                  <p className="text-[9px] uppercase tracking-widest text-[#a19f9a] mt-1">
+                    Property Unit #{room.id}
+                  </p>
               </div>
             </div>
 
@@ -537,7 +562,7 @@ export default function BookingModal({ onClose }) {
             <div className="space-y-3.5 text-xs">
               <div className="flex justify-between items-center text-[#a19f9a]">
                 <span>Rate per Night:</span>
-                <span className="font-semibold text-white">Rs {selectedRoom.price.toLocaleString()}</span>
+                <span className="font-semibold text-white">Rs {room.price.toLocaleString()}</span>
               </div>
               <div className="flex justify-between items-center text-[#a19f9a]">
                 <span>Number of Nights:</span>
