@@ -93,6 +93,7 @@ export default function AdminPage() {
     handleEditRoom,
     handleDeleteRoom,
     handleMarkAvailable,
+    resetBookingForm,
     editingRoom,
     setEditingRoom,
     email,
@@ -870,9 +871,13 @@ export default function AdminPage() {
               <button onClick={() => handleDeleteRoom(selectedRoom)} className="flex-1 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 py-4 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all">Delete</button>
               {selectedRoom.status === "Available" && (
                 <button
-                  onClick={() => {
-                    handleBookRoom();
-                    setActiveTab("bookings");
+                  onClick={async () => {
+                    const result = await handleBookRoom();
+                    if (result) {
+                      resetBookingForm();
+                      setSelectedRoom(null);
+                      setActiveTab("bookings");
+                    }
                   }}
                   disabled={!customerName || !idCard || !phoneNumber || !checkInDate || !checkOutDate}
                   className="flex-1 bg-[#D4AF37] hover:bg-[#bfa232] disabled:opacity-50 disabled:hover:bg-[#D4AF37] py-4 rounded-2xl font-bold text-xs uppercase tracking-widest text-[#070708] shadow-lg shadow-[#D4AF37]/10 transition-all"

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { useBooking } from "@/context/BookingContext";
 import { X, Calendar, User, CreditCard, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
 
