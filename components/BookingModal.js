@@ -560,7 +560,7 @@ export default function BookingModal({ onClose }) {
                 type="button"
                 onClick={nextStep}
                 disabled={step === 2 && (!customerName || !idCard || !phoneNumber)}
-                className="bg-gold disabled:opacity-50 text-[#070708] text-[10px] font-bold uppercase tracking-widest px-6 py-3 transition-all flex items-center gap-2 hover:bg-[#bfa232] cursor-pointer"
+                className="bg-gold disabled:opacity-50 text-obsidian text-[10px] font-bold uppercase tracking-widest px-6 py-3 transition-all flex items-center gap-2 hover:bg-[#bfa232] cursor-pointer"
               >
                 Continue <ArrowRight className="w-3.5 h-3.5" />
               </button>
