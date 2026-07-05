@@ -47,6 +47,7 @@ const Icons = {
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("rooms");
   const [viewedBooking, setViewedBooking] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Analytics state
   const [analyticsData, setAnalyticsData] = useState(null);
@@ -131,18 +132,37 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="flex h-screen bg-[#070708] text-[#f4f2ee] font-sans selection:bg-[#D4AF37]/30">
+    <div className="flex h-screen bg-[#070708] text-[#f4f2ee] font-sans selection:bg-[#D4AF37]/30 relative overflow-hidden">
+
+      {/* Sidebar Overlay (Mobile) */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs md:hidden animate-in fade-in duration-300"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
 
       {/* Sidebar */}
-      <aside className="w-64 bg-[#0c0c0e]/90 backdrop-blur-xl border-r border-[#1a1a1f] p-6 flex flex-col gap-8">
-        <div className="flex items-center gap-3 group cursor-pointer" onClick={() => setActiveTab("rooms")}>
-          <div className="w-10 h-10 bg-gradient-to-br from-[#D4AF37] to-[#AA7C11] rounded-xl flex items-center justify-center shadow-lg shadow-[#D4AF37]/10 group-hover:scale-105 transition-transform">
-            <span className="text-xl font-bold text-[#070708]">G</span>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#0c0c0e]/95 md:bg-[#0c0c0e]/90 backdrop-blur-xl border-r border-[#1a1a1f] p-6 flex flex-col gap-8 transition-transform duration-300 md:relative md:translate-x-0 ${
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      }`}>
+        <div className="flex items-center justify-between group cursor-pointer" onClick={() => { setActiveTab("rooms"); setIsSidebarOpen(false); }}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#D4AF37] to-[#AA7C11] rounded-xl flex items-center justify-center shadow-lg shadow-[#D4AF37]/10 group-hover:scale-105 transition-transform">
+              <span className="text-xl font-bold text-[#070708]">G</span>
+            </div>
+            <div>
+              <h2 className="text-lg font-bold tracking-tight text-[#f4f2ee]">Grand Stay</h2>
+              <p className="text-[10px] text-[#D4AF37] uppercase tracking-widest font-semibold">Admin Panel</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-lg font-bold tracking-tight text-[#f4f2ee]">Grand Stay</h2>
-            <p className="text-[10px] text-[#D4AF37] uppercase tracking-widest font-semibold">Admin Panel</p>
-          </div>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); setIsSidebarOpen(false); }}
+            className="md:hidden p-1.5 rounded-lg hover:bg-[#1a1a1f] text-slate-400 hover:text-white transition-colors"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+          </button>
         </div>
 
         {/* nav buttons  */}
@@ -158,8 +178,8 @@ export default function AdminPage() {
           ].map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 ${activeTab === item.id
+              onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 w-full text-left ${activeTab === item.id
                 ? "bg-[#D4AF37] text-[#070708] font-bold shadow-lg shadow-[#D4AF37]/20 translate-x-1"
                 : "text-slate-400 hover:bg-[#1a1a1f] hover:text-white"
                 }`}
@@ -191,38 +211,47 @@ export default function AdminPage() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-8 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-[#111114] via-[#070708] to-[#070708]">
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-[#111114] via-[#070708] to-[#070708]">
 
         {/* Header */}
-        <header className="flex justify-between items-center mb-10">
-          <div className="animate-in fade-in slide-in-from-left duration-700">
-            <h1 className="text-4xl font-serif text-white capitalize tracking-tight mb-1">{activeTab} Dashboard</h1>
-            <p className="text-[#a19f9a] text-sm">Managing your property at your fingertips.</p>
+        <header className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-6 md:mb-10">
+          <div className="flex items-center gap-3 animate-in fade-in slide-in-from-left duration-700">
+            <button
+              type="button"
+              onClick={() => setIsSidebarOpen(true)}
+              className="md:hidden p-2.5 text-slate-400 hover:text-white bg-[#0c0c0e]/80 border border-[#1a1a1f] rounded-xl flex items-center justify-center transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+            </button>
+            <div>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif text-white capitalize tracking-tight mb-1">{activeTab} Dashboard</h1>
+              <p className="text-[#a19f9a] text-xs sm:text-sm">Managing your property at your fingertips.</p>
+            </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
             {/* search bar */}
-            <div className="relative group">
+            <div className="relative group flex-1 sm:flex-none">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#D4AF37] transition-colors">
                 <Icons.Search />
               </span>
               <input
                 type="text"
                 placeholder="Search..."
-                className="bg-[#0c0c0e]/85 border border-[#1a1a1f] rounded-full py-2.5 pl-10 pr-5 text-sm focus:outline-none focus:ring-1 focus:ring-[#D4AF37] w-72 backdrop-blur-sm transition-all focus:w-80"
+                className="bg-[#0c0c0e]/85 border border-[#1a1a1f] rounded-full py-2.5 pl-9 pr-4 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#D4AF37] w-full sm:w-64 backdrop-blur-sm transition-all sm:focus:w-72"
               />
             </div>
 
             {/* notification button */}
-            <button className="relative w-11 h-11 rounded-full bg-[#0c0c0e]/85 border border-[#1a1a1f] flex items-center justify-center hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition-all group">
+            <button className="relative w-10 h-10 rounded-full bg-[#0c0c0e]/85 border border-[#1a1a1f] flex items-center justify-center hover:bg-[#D4AF37]/10 hover:border-[#D4AF37]/30 transition-all group shrink-0">
               <Icons.Bell />
-              <span className="absolute top-3 right-3 w-2 h-2 bg-[#D4AF37] rounded-full ring-4 ring-[#070708] group-hover:scale-110 transition-transform"></span>
+              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-[#D4AF37] rounded-full ring-4 ring-[#070708] group-hover:scale-110 transition-transform"></span>
             </button>
           </div>
         </header>
 
         {/* Stats Section */}
         {activeTab === "rooms" && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8 md:mb-10 animate-in fade-in slide-in-from-top duration-500">
             {[
               { label: "Total Capacity", value: totalRoomsCount, color: "bg-[#D4AF37]", icon: "🏢" },
               { label: "Available Now", value: availableRoomsCount, color: "bg-emerald-500", icon: "✅" },
@@ -249,8 +278,8 @@ export default function AdminPage() {
 
           {/* rooms page */}
           {activeTab === "rooms" && (
-            <div className="p-8">
-              <div className="flex justify-between items-end mb-8">
+            <div className="p-4 sm:p-6 md:p-8">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
                 <div>
                   <h3 className="text-2xl font-serif text-white mb-1">Room Inventory</h3>
                   <p className="text-slate-500 text-sm">Visual status of all property units</p>
@@ -263,12 +292,12 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-3.5">
+              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 gap-2.5 sm:gap-3.5">
                 {rooms.map((room) => (
                   <div
                     key={room.id}
                     onClick={() => setSelectedRoom(room)}
-                    className={`aspect-square rounded-xl flex flex-col items-center justify-center text-[10px] font-black transition-all cursor-pointer relative group ${room.status === "Available"
+                    className={`aspect-square rounded-xl flex flex-col items-center justify-center text-[8px] sm:text-[10px] font-black transition-all cursor-pointer relative group ${room.status === "Available"
                       ? "bg-emerald-500/5 border border-emerald-500/10 text-emerald-400/50 hover:bg-emerald-500/20 hover:text-emerald-300 hover:border-emerald-500/30"
                       : room.status === "Booked"
                         ? "bg-rose-500/5 border border-rose-500/10 text-rose-400/50 hover:bg-rose-500/20 hover:text-rose-300 hover:border-rose-500/30"
@@ -276,7 +305,7 @@ export default function AdminPage() {
                       }`}
                   >
                     <span className="mb-0.5 opacity-40 group-hover:opacity-100 transition-opacity uppercase tracking-tighter">{room.type}</span>
-                    <span className="text-sm group-hover:scale-110 transition-transform font-black">#{room.id}</span>
+                    <span className="text-sm group-hover:scale-110 transition-transform font-black font-serif">#{room.id}</span>
                     <div className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-[#070708] ${room.status === "Available" ? "bg-emerald-500" : room.status === "Booked" ? "bg-rose-500" : "bg-amber-500"
                       }`}></div>
                   </div>
@@ -288,12 +317,12 @@ export default function AdminPage() {
           {/* booking page */}
           {activeTab === "bookings" && (
             <div className="p-0">
-              <div className="p-8 border-b border-[#1a1a1f] flex justify-between items-center bg-[#0c0c0e]/30">
+              <div className="p-4 sm:p-6 md:p-8 border-b border-[#1a1a1f] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#0c0c0e]/30">
                 <div>
                   <h3 className="text-2xl font-serif text-white mb-1">Active Bookings</h3>
                   <p className="text-slate-500 text-sm">Managing {bookings.length} current customer stays</p>
                 </div>
-                <button onClick={() => setActiveTab("rooms")} className="bg-[#D4AF37] hover:bg-[#bfa232] text-[#070708] px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-[#D4AF37]/10">New Booking</button>
+                <button onClick={() => setActiveTab("rooms")} className="bg-[#D4AF37] hover:bg-[#bfa232] text-[#070708] px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-[#D4AF37]/10 w-full sm:w-auto">New Booking</button>
               </div>
               {bookings.length === 0 ? (
                 <div className="p-20 text-center flex flex-col items-center gap-4">
@@ -304,60 +333,62 @@ export default function AdminPage() {
                   <p className="text-slate-600 text-sm max-w-xs">Start by selecting an available room from the inventory section to create your first booking.</p>
                 </div>
               ) : (
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-[#050507] text-[#D4AF37] text-[10px] uppercase font-bold tracking-widest">
-                      <th className="px-8 py-5 border-b border-[#1a1a1f]">Unit No.</th>
-                      <th className="px-8 py-5 border-b border-[#1a1a1f]">Customer Details</th>
-                      <th className="px-8 py-5 border-b border-[#1a1a1f]">Check-In Period</th>
-                      <th className="px-8 py-5 border-b border-[#1a1a1f]">Payment Status</th>
-                      <th className="px-8 py-5 border-b border-[#1a1a1f] text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#1a1a1f]">
-                    {bookings.filter(b => !b.isCompleted).map((booking) => (
-                      <tr key={booking.id} className="hover:bg-[#D4AF37]/5 transition-colors group">
-                        <td className="px-8 py-6">
-                          <span className="bg-[#1c1c22] text-[#D4AF37] px-3 py-1.5 rounded-lg text-xs font-bold border border-[#D4AF37]/20">UNIT {booking.room}</span>
-                        </td>
-                        <td className="px-8 py-6">
-                          <div className="font-bold text-slate-100 mb-0.5">{booking.customer}</div>
-                          <div className="text-[10px] text-slate-500 uppercase tracking-tight font-bold">ID: {booking.bookingId || `REZ-${booking.id}`}</div>
-                        </td>
-                        <td className="px-8 py-6">
-                          <div className="flex items-center gap-3">
-                            <div className="text-xs font-bold text-slate-300">{booking.checkIn}</div>
-                            <div className="w-4 h-px bg-slate-700"></div>
-                            <div className="text-xs font-bold text-slate-300">{booking.checkOut}</div>
-                          </div>
-                        </td>
-                        <td className="px-8 py-6">
-                          <span className={`text-[9px] uppercase font-black px-3 py-1.5 rounded-lg border tracking-widest ${(booking.paymentStatus || booking.status) === "Paid"
-                            ? "bg-emerald-500/5 text-emerald-400 border-emerald-500/20"
-                            : "bg-amber-500/5 text-amber-400 border-amber-500/20"
-                            }`}>
-                            {booking.paymentStatus || booking.status}
-                          </span>
-                        </td>
-                        <td className="px-8 py-6 text-right">
-                          <div className="flex justify-end gap-2">
-                            <button onClick={() => handleCheckOut(booking.id)} className="px-4 py-2 bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white rounded-lg text-xs font-bold transition-all">Check Out</button>
-                            <button onClick={() => handleCancelBooking(booking.id)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold transition-all">Cancel</button>
-                            <button onClick={() => setViewedBooking(booking)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold transition-all">View</button>
-                          </div>
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse min-w-[750px] md:min-w-full">
+                    <thead>
+                      <tr className="bg-[#050507] text-[#D4AF37] text-[10px] uppercase font-bold tracking-widest">
+                        <th className="px-6 md:px-8 py-5 border-b border-[#1a1a1f]">Unit No.</th>
+                        <th className="px-6 md:px-8 py-5 border-b border-[#1a1a1f]">Customer Details</th>
+                        <th className="px-6 md:px-8 py-5 border-b border-[#1a1a1f]">Check-In Period</th>
+                        <th className="px-6 md:px-8 py-5 border-b border-[#1a1a1f]">Payment Status</th>
+                        <th className="px-6 md:px-8 py-5 border-b border-[#1a1a1f] text-right">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-[#1a1a1f]">
+                      {bookings.filter(b => !b.isCompleted).map((booking) => (
+                        <tr key={booking.id} className="hover:bg-[#D4AF37]/5 transition-colors group">
+                          <td className="px-6 md:px-8 py-6">
+                            <span className="bg-[#1c1c22] text-[#D4AF37] px-3 py-1.5 rounded-lg text-xs font-bold border border-[#D4AF37]/20">UNIT {booking.room}</span>
+                          </td>
+                          <td className="px-6 md:px-8 py-6">
+                            <div className="font-bold text-slate-100 mb-0.5">{booking.customer}</div>
+                            <div className="text-[10px] text-slate-500 uppercase tracking-tight font-bold">ID: {booking.bookingId || `REZ-${booking.id}`}</div>
+                          </td>
+                          <td className="px-6 md:px-8 py-6">
+                            <div className="flex items-center gap-3">
+                              <div className="text-xs font-bold text-slate-300">{booking.checkIn}</div>
+                              <div className="w-4 h-px bg-slate-700"></div>
+                              <div className="text-xs font-bold text-slate-300">{booking.checkOut}</div>
+                            </div>
+                          </td>
+                          <td className="px-6 md:px-8 py-6">
+                            <span className={`text-[9px] uppercase font-black px-3 py-1.5 rounded-lg border tracking-widest ${(booking.paymentStatus || booking.status) === "Paid"
+                              ? "bg-emerald-500/5 text-emerald-400 border-emerald-500/20"
+                              : "bg-amber-500/5 text-amber-400 border-amber-500/20"
+                              }`}>
+                              {booking.paymentStatus || booking.status}
+                            </span>
+                          </td>
+                          <td className="px-6 md:px-8 py-6 text-right">
+                            <div className="flex justify-end gap-2">
+                              <button onClick={() => handleCheckOut(booking.id)} className="px-3 md:px-4 py-2 bg-rose-500/10 text-rose-400 hover:bg-rose-500 hover:text-white rounded-lg text-xs font-bold transition-all">Check Out</button>
+                              <button onClick={() => handleCancelBooking(booking.id)} className="px-3 md:px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold transition-all">Cancel</button>
+                              <button onClick={() => setViewedBooking(booking)} className="px-3 md:px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold transition-all">View</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           )}
 
           {/* Customers page */}
           {activeTab === "customers" && (
-            <div className="p-8">
-              <div className="flex justify-between items-center mb-8">
+            <div className="p-4 sm:p-6 md:p-8">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
                 <div>
                   <h3 className="text-2xl font-serif text-white mb-1">Customer Directory</h3>
                   <p className="text-slate-500 text-sm">{customers.length} registered guests · {services.length} active services</p>
@@ -370,48 +401,50 @@ export default function AdminPage() {
                   <p className="text-slate-600 text-sm">Customers are created automatically when bookings are made.</p>
                 </div>
               ) : (
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-[#050507] text-[#D4AF37] text-[10px] uppercase font-bold tracking-widest">
-                      <th className="px-6 py-4 border-b border-[#1a1a1f]">Guest</th>
-                      <th className="px-6 py-4 border-b border-[#1a1a1f]">Contact</th>
-                      <th className="px-6 py-4 border-b border-[#1a1a1f]">Bookings</th>
-                      <th className="px-6 py-4 border-b border-[#1a1a1f]">Loyalty Points</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#1a1a1f]">
-                    {customers.map((c) => (
-                      <tr key={c.id} className="hover:bg-[#D4AF37]/5 transition-colors">
-                        <td className="px-6 py-5">
-                          <div className="font-bold text-slate-100">{c.fullName}</div>
-                          <div className="text-[10px] text-slate-500">{c.address || "No address"}</div>
-                        </td>
-                        <td className="px-6 py-5">
-                          <div className="text-xs text-slate-300">{c.email}</div>
-                          <div className="text-[10px] text-slate-500">{c.phone}</div>
-                        </td>
-                        <td className="px-6 py-5 font-bold text-slate-300">{c.bookingHistory?.length || 0}</td>
-                        <td className="px-6 py-5">
-                          <span className="bg-[#D4AF37]/10 text-[#D4AF37] px-3 py-1 rounded-lg text-xs font-bold">{c.loyaltyPoints?.toLocaleString()}</span>
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse min-w-[700px] md:min-w-full">
+                    <thead>
+                      <tr className="bg-[#050507] text-[#D4AF37] text-[10px] uppercase font-bold tracking-widest">
+                        <th className="px-6 py-4 border-b border-[#1a1a1f]">Guest</th>
+                        <th className="px-6 py-4 border-b border-[#1a1a1f]">Contact</th>
+                        <th className="px-6 py-4 border-b border-[#1a1a1f]">Bookings</th>
+                        <th className="px-6 py-4 border-b border-[#1a1a1f]">Loyalty Points</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-[#1a1a1f]">
+                      {customers.map((c) => (
+                        <tr key={c.id} className="hover:bg-[#D4AF37]/5 transition-colors">
+                          <td className="px-6 py-5">
+                            <div className="font-bold text-slate-100">{c.fullName}</div>
+                            <div className="text-[10px] text-slate-500">{c.address || "No address"}</div>
+                          </td>
+                          <td className="px-6 py-5">
+                            <div className="text-xs text-slate-300">{c.email}</div>
+                            <div className="text-[10px] text-slate-500">{c.phone}</div>
+                          </td>
+                          <td className="px-6 py-5 font-bold text-slate-300">{c.bookingHistory?.length || 0}</td>
+                          <td className="px-6 py-5">
+                            <span className="bg-[#D4AF37]/10 text-[#D4AF37] px-3 py-1 rounded-lg text-xs font-bold">{c.loyaltyPoints?.toLocaleString()}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           )}
 
           {/* staff page */}
           {activeTab === "staff" && (
-            <div className="p-8">
-              <div className="flex justify-between items-center mb-8">
+            <div className="p-4 sm:p-6 md:p-8">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
                 <div>
                   <h3 className="text-2xl font-serif text-white mb-1">Staff Members</h3>
                   <p className="text-slate-500 text-sm">Managing {staff.length} active staff members</p>
                 </div>
-                <div className="flex gap-2">
-                  <button onClick={() => setIsStaffModalOpen(true)} className="bg-[#D4AF37] hover:bg-[#bfa232] text-[#070708] px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-[#D4AF37]/10 flex items-center gap-2">
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <button onClick={() => setIsStaffModalOpen(true)} className="bg-[#D4AF37] hover:bg-[#bfa232] text-[#070708] px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-[#D4AF37]/10 flex items-center gap-2 justify-center w-full sm:w-auto">
                     <Icons.Staff />
                     Add Staff
                   </button>
@@ -426,7 +459,7 @@ export default function AdminPage() {
                   <button onClick={() => setIsStaffModalOpen(true)} className="text-[#D4AF37] font-bold hover:underline">Add your first employee</button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                   {staff.map((member) => (
                     <div key={member.id} className="bg-[#0b0b0e] border border-slate-800 p-6 rounded-3xl flex flex-col items-center text-center group hover:border-[#D4AF37]/40 hover:bg-[#D4AF37]/2 transition-all duration-500">
                       <div className="relative mb-5">
@@ -458,7 +491,7 @@ export default function AdminPage() {
           {/* booking History page  */}
           {activeTab === "history" && (
             <div className="p-0">
-              <div className="p-8 border-b border-[#1a1a1f] flex justify-between items-center bg-[#0c0c0e]/30">
+              <div className="p-4 sm:p-6 md:p-8 border-b border-[#1a1a1f] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#0c0c0e]/30">
                 <div>
                   <h3 className="text-2xl font-serif text-white mb-1">Booking History</h3>
                   <p className="text-slate-500 text-sm">Reviewing all past and current property stays</p>
@@ -472,64 +505,66 @@ export default function AdminPage() {
                   <h4 className="text-xl font-bold text-slate-400">No history found</h4>
                 </div>
               ) : (
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-[#050507] text-[#D4AF37] text-[10px] uppercase font-bold tracking-widest">
-                      <th className="px-8 py-5 border-b border-[#1a1a1f]">Unit No.</th>
-                      <th className="px-8 py-5 border-b border-[#1a1a1f]">Customer Details</th>
-                      <th className="px-8 py-5 border-b border-[#1a1a1f]">Check-In Period</th>
-                      <th className="px-8 py-5 border-b border-[#1a1a1f]">Booking Status</th>
-                      <th className="px-8 py-5 border-b border-[#1a1a1f] text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#1a1a1f]">
-                    {bookings.map((booking) => (
-                      <tr key={booking.id} className="hover:bg-[#D4AF37]/5 transition-colors group">
-                        <td className="px-8 py-6">
-                          <span className="bg-[#1c1c22] text-[#D4AF37] px-3 py-1.5 rounded-lg text-xs font-bold border border-[#D4AF37]/20">UNIT {booking.room}</span>
-                        </td>
-                        <td className="px-8 py-6">
-                          <div className="font-bold text-slate-100 mb-0.5">{booking.customer}</div>
-                          <div className="text-[10px] text-slate-500 uppercase tracking-tight font-bold">ID: {booking.bookingId || `REZ-${booking.id}`}</div>
-                        </td>
-                        <td className="px-8 py-6">
-                          <div className="flex items-center gap-3">
-                            <div className="text-xs font-bold text-slate-300">{booking.checkIn}</div>
-                            <div className="w-4 h-px bg-slate-700"></div>
-                            <div className="text-xs font-bold text-slate-300">{booking.checkOut}</div>
-                          </div>
-                        </td>
-                        <td className="px-8 py-6">
-                          <span className={`text-[9px] uppercase font-black px-3 py-1.5 rounded-lg border tracking-widest ${booking.isCompleted
-                            ? "bg-slate-500/10 text-slate-400 border-slate-500/20"
-                            : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                            }`}>
-                            {booking.isCompleted ? "Completed" : "Active"}
-                          </span>
-                        </td>
-                        <td className="px-8 py-6 text-right">
-                          <div className="flex justify-end gap-2">
-                            <button onClick={() => setViewedBooking(booking)} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold transition-all">View</button>
-                            <button className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold transition-all">Invoice</button>
-                          </div>
-                        </td>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse min-w-[750px] md:min-w-full">
+                    <thead>
+                      <tr className="bg-[#050507] text-[#D4AF37] text-[10px] uppercase font-bold tracking-widest">
+                        <th className="px-6 md:px-8 py-5 border-b border-[#1a1a1f]">Unit No.</th>
+                        <th className="px-6 md:px-8 py-5 border-b border-[#1a1a1f]">Customer Details</th>
+                        <th className="px-6 md:px-8 py-5 border-b border-[#1a1a1f]">Check-In Period</th>
+                        <th className="px-6 md:px-8 py-5 border-b border-[#1a1a1f]">Booking Status</th>
+                        <th className="px-6 md:px-8 py-5 border-b border-[#1a1a1f] text-right">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-[#1a1a1f]">
+                      {bookings.map((booking) => (
+                        <tr key={booking.id} className="hover:bg-[#D4AF37]/5 transition-colors group">
+                          <td className="px-6 md:px-8 py-6">
+                            <span className="bg-[#1c1c22] text-[#D4AF37] px-3 py-1.5 rounded-lg text-xs font-bold border border-[#D4AF37]/20">UNIT {booking.room}</span>
+                          </td>
+                          <td className="px-6 md:px-8 py-6">
+                            <div className="font-bold text-slate-100 mb-0.5">{booking.customer}</div>
+                            <div className="text-[10px] text-slate-500 uppercase tracking-tight font-bold">ID: {booking.bookingId || `REZ-${booking.id}`}</div>
+                          </td>
+                          <td className="px-6 md:px-8 py-6">
+                            <div className="flex items-center gap-3">
+                              <div className="text-xs font-bold text-slate-300">{booking.checkIn}</div>
+                              <div className="w-4 h-px bg-slate-700"></div>
+                              <div className="text-xs font-bold text-slate-300">{booking.checkOut}</div>
+                            </div>
+                          </td>
+                          <td className="px-6 md:px-8 py-6">
+                            <span className={`text-[9px] uppercase font-black px-3 py-1.5 rounded-lg border tracking-widest ${booking.isCompleted
+                              ? "bg-slate-500/10 text-slate-400 border-slate-500/20"
+                              : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                              }`}>
+                              {booking.isCompleted ? "Completed" : "Active"}
+                            </span>
+                          </td>
+                          <td className="px-6 md:px-8 py-6 text-right">
+                            <div className="flex justify-end gap-2">
+                              <button onClick={() => setViewedBooking(booking)} className="px-3 md:px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold transition-all">View</button>
+                              <button className="px-3 md:px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold transition-all">Invoice</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           )}
 
           {/* Analytics Page */}
           {activeTab === "analytics" && (
-            <div className="p-8">
-              <div className="flex justify-between items-end mb-8">
+            <div className="p-4 sm:p-6 md:p-8">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
                 <div>
                   <h3 className="text-2xl font-serif text-white mb-1">Revenue & Booking Analytics</h3>
                   <p className="text-slate-500 text-sm">Insights on your property performance</p>
                 </div>
-                <div className="flex gap-1 bg-[#050507] p-1 rounded-xl border border-slate-800">
+                <div className="flex gap-1 bg-[#050507] p-1 rounded-xl border border-slate-800 self-start sm:self-auto">
                   {["daily", "monthly", "yearly"].map((period) => (
                     <button
                       key={period}
@@ -584,7 +619,7 @@ export default function AdminPage() {
                 return (
                   <>
                     {/* Summary Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mb-8 md:mb-10">
                       {[
                         { label: "Total Bookings", value: analyticsData.totalBookings, icon: "📋", color: "indigo", sub: `${analyticsData.activeBookings} active` },
                         { label: "Total Revenue", value: `Rs ${analyticsData.totalRevenue.toLocaleString()}`, icon: "💰", color: "emerald", sub: `Avg Rs ${avgRevenue.toLocaleString()}/booking` },
@@ -608,12 +643,12 @@ export default function AdminPage() {
                     ) : (
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Revenue Chart */}
-                        <div className="bg-[#0b0b0e] border border-slate-800 rounded-2xl p-6">
+                        <div className="bg-[#0b0b0e] border border-slate-800 rounded-2xl p-4 sm:p-6">
                           <h4 className="text-sm font-bold uppercase tracking-widest text-[#D4AF37] mb-6">Revenue ({analyticsPeriod})</h4>
-                          <div className="flex items-end gap-2 h-56">
+                          <div className="flex items-end gap-1 sm:gap-2 h-56">
                             {chartData.slice(-12).map((item, i) => (
                               <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
-                                <span className="text-[9px] font-bold text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Rs {item.revenue.toLocaleString()}</span>
+                                <span className="text-[8px] sm:text-[9px] font-bold text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Rs {item.revenue.toLocaleString()}</span>
                                 <div className="w-full relative flex-1 flex items-end">
                                   <div
                                     className="w-full rounded-t-lg bg-gradient-to-t from-[#AA7C11] to-[#D4AF37] group-hover:from-emerald-500 group-hover:to-emerald-300 transition-all duration-500"
@@ -623,19 +658,19 @@ export default function AdminPage() {
                                     }}
                                   ></div>
                                 </div>
-                                <span className="text-[8px] font-bold text-slate-600 text-center leading-tight">{formatLabel(item.date)}</span>
+                                <span className="text-[7px] sm:text-[8px] font-bold text-slate-600 text-center leading-tight">{formatLabel(item.date)}</span>
                               </div>
                             ))}
                           </div>
                         </div>
 
                         {/* Bookings Chart */}
-                        <div className="bg-[#0b0b0e] border border-slate-800 rounded-2xl p-6">
+                        <div className="bg-[#0b0b0e] border border-slate-800 rounded-2xl p-4 sm:p-6">
                           <h4 className="text-sm font-bold uppercase tracking-widest text-[#D4AF37] mb-6">Bookings ({analyticsPeriod})</h4>
-                          <div className="flex items-end gap-2 h-56">
+                          <div className="flex items-end gap-1 sm:gap-2 h-56">
                             {chartData.slice(-12).map((item, i) => (
                               <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
-                                <span className="text-[9px] font-bold text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">{item.bookings}</span>
+                                <span className="text-[8px] sm:text-[9px] font-bold text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">{item.bookings}</span>
                                 <div className="w-full relative flex-1 flex items-end">
                                   <div
                                     className="w-full rounded-t-lg bg-gradient-to-t from-slate-700 to-[#D4AF37] transition-all duration-500"
@@ -645,7 +680,7 @@ export default function AdminPage() {
                                     }}
                                   ></div>
                                 </div>
-                                <span className="text-[8px] font-bold text-slate-600 text-center leading-tight">{formatLabel(item.date)}</span>
+                                <span className="text-[7px] sm:text-[8px] font-bold text-slate-600 text-center leading-tight">{formatLabel(item.date)}</span>
                               </div>
                             ))}
                           </div>
@@ -656,28 +691,30 @@ export default function AdminPage() {
                     {/* Detail Table */}
                     {chartData.length > 0 && (
                       <div className="mt-6 bg-[#0b0b0e] border border-slate-800 rounded-2xl overflow-hidden">
-                        <table className="w-full text-left border-collapse">
-                          <thead>
-                            <tr className="bg-[#050507] text-[#D4AF37] text-[10px] uppercase font-bold tracking-widest">
-                              <th className="px-6 py-4 border-b border-slate-800">Period</th>
-                              <th className="px-6 py-4 border-b border-slate-800">Total Bookings</th>
-                              <th className="px-6 py-4 border-b border-slate-800">Total Revenue</th>
-                              <th className="px-6 py-4 border-b border-slate-800">Avg Revenue / Booking</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-slate-800">
-                            {chartData.map((item, i) => (
-                              <tr key={i} className="hover:bg-[#D4AF37]/5 transition-colors">
-                                <td className="px-6 py-4">
-                                  <span className="bg-slate-800 text-slate-100 px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-700">{formatLabel(item.date)}</span>
-                                </td>
-                                <td className="px-6 py-4 font-bold text-slate-200">{item.bookings}</td>
-                                <td className="px-6 py-4 font-bold text-emerald-400">Rs {item.revenue.toLocaleString()}</td>
-                                <td className="px-6 py-4 font-bold text-slate-400">Rs {item.bookings > 0 ? Math.round(item.revenue / item.bookings).toLocaleString() : 0}</td>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left border-collapse min-w-[700px] md:min-w-full">
+                            <thead>
+                              <tr className="bg-[#050507] text-[#D4AF37] text-[10px] uppercase font-bold tracking-widest">
+                                <th className="px-6 py-4 border-b border-slate-800">Period</th>
+                                <th className="px-6 py-4 border-b border-slate-800">Total Bookings</th>
+                                <th className="px-6 py-4 border-b border-slate-800">Total Revenue</th>
+                                <th className="px-6 py-4 border-b border-slate-800">Avg Revenue / Booking</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody className="divide-y divide-slate-800">
+                              {chartData.map((item, i) => (
+                                <tr key={i} className="hover:bg-[#D4AF37]/5 transition-colors">
+                                  <td className="px-6 py-4">
+                                    <span className="bg-slate-800 text-slate-100 px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-700">{formatLabel(item.date)}</span>
+                                  </td>
+                                  <td className="px-6 py-4 font-bold text-slate-200">{item.bookings}</td>
+                                  <td className="px-6 py-4 font-bold text-emerald-400">Rs {item.revenue.toLocaleString()}</td>
+                                  <td className="px-6 py-4 font-bold text-slate-400">Rs {item.bookings > 0 ? Math.round(item.revenue / item.bookings).toLocaleString() : 0}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     )}
                   </>
@@ -688,13 +725,13 @@ export default function AdminPage() {
 
           {/* Maintenance Page */}
           {activeTab === "maintenance" && (
-            <div className="p-8">
-              <div className="flex justify-between items-end mb-8">
+            <div className="p-4 sm:p-6 md:p-8">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
                 <div>
                   <h3 className="text-2xl font-serif text-white mb-1">Room Maintenance</h3>
                   <p className="text-slate-500 text-sm">Rooms requiring cleaning, inspection, or repairs after checkout</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 self-start sm:self-auto">
                   <div className="bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-xl">
                     <span className="text-amber-400 text-xs font-bold uppercase tracking-widest">{maintenanceRoomsCount} rooms pending</span>
                   </div>
@@ -710,7 +747,7 @@ export default function AdminPage() {
                   <p className="text-slate-600 text-sm max-w-xs">All rooms are in great shape! Rooms will appear here automatically after guest checkout.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
                   {rooms.filter(r => r.status === "Maintenance").map((room) => (
                     <div key={room.id} className="bg-[#0b0b0e] border border-amber-500/20 rounded-2xl p-6 group hover:border-[#D4AF37]/30 hover:bg-[#D4AF37]/2 transition-all duration-500">
                       <div className="flex items-start justify-between mb-5">
@@ -739,11 +776,7 @@ export default function AdminPage() {
                       </div>
 
                       <div className="flex gap-3">
-                        <button
-                          onClick={() => handleMarkAvailable(room.id)}
-                          className="flex-1 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white border border-emerald-500/20 hover:border-emerald-500 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-2"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                        <button onClick={() => handleMarkAvailable(room.id)} className="w-full bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white py-3 rounded-xl text-xs font-bold tracking-widest transition-all uppercase">
                           Mark Available
                         </button>
                       </div>
@@ -760,7 +793,7 @@ export default function AdminPage() {
       {selectedRoom && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setSelectedRoom(null)}></div>
-          <div className="relative bg-[#0c0c0e] border border-slate-800 w-full max-w-md rounded-[2rem] p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+          <div className="relative bg-[#0c0c0e] border border-slate-800 w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl md:rounded-[2rem] p-5 sm:p-8 shadow-2xl animate-in zoom-in-95 duration-300">
             <button
               onClick={() => setSelectedRoom(null)}
               className="absolute top-6 right-6 w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-slate-700 transition-colors"
@@ -894,7 +927,7 @@ export default function AdminPage() {
       {isStaffModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setIsStaffModalOpen(false)}></div>
-          <form onSubmit={handleAddStaff} className="relative bg-[#0c0c0e] border border-slate-800 w-full max-w-md rounded-[2rem] p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+          <form onSubmit={handleAddStaff} className="relative bg-[#0c0c0e] border border-slate-800 w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl md:rounded-[2rem] p-5 sm:p-8 shadow-2xl animate-in zoom-in-95 duration-300">
             <h3 className="text-2xl font-serif text-white mb-6">New Team Member</h3>
 
             <div className="space-y-6 mb-8">
@@ -961,7 +994,7 @@ export default function AdminPage() {
       {isRoomModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setIsRoomModalOpen(false)}></div>
-          <form onSubmit={handleAddRoom} className="relative bg-[#0c0c0e] border border-slate-800 w-full max-w-md rounded-[2rem] p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+          <form onSubmit={handleAddRoom} className="relative bg-[#0c0c0e] border border-slate-800 w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl md:rounded-[2rem] p-5 sm:p-8 shadow-2xl animate-in zoom-in-95 duration-300">
             <h3 className="text-2xl font-serif text-white mb-6">New Property Unit</h3>
 
             <div className="space-y-6 mb-8">
@@ -1014,7 +1047,7 @@ export default function AdminPage() {
       {editingRoom && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setEditingRoom(null)}></div>
-          <form onSubmit={handleEditRoom} className="relative bg-[#0c0c0e] border border-slate-800 w-full max-w-md rounded-[2rem] p-8 shadow-2xl">
+          <form onSubmit={handleEditRoom} className="relative bg-[#0c0c0e] border border-slate-800 w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl md:rounded-[2rem] p-5 sm:p-8 shadow-2xl">
             <h3 className="text-2xl font-serif text-white mb-6">Edit Room #{editingRoom.id}</h3>
             <div className="space-y-4 mb-8">
               <input type="text" value={editingRoom.roomName || ""} onChange={(e) => setEditingRoom({ ...editingRoom, roomName: e.target.value })} placeholder="Room Name" className="w-full bg-[#050507] border border-slate-800 rounded-xl py-3 px-4 text-sm text-white" />
@@ -1038,7 +1071,7 @@ export default function AdminPage() {
       {viewedBooking && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300" onClick={() => setViewedBooking(null)}></div>
-          <div className="relative bg-[#0c0c0e] border border-slate-800 w-full max-w-md rounded-[2rem] p-8 shadow-2xl animate-in zoom-in-95 duration-300">
+          <div className="relative bg-[#0c0c0e] border border-slate-800 w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl md:rounded-[2rem] p-5 sm:p-8 shadow-2xl animate-in zoom-in-95 duration-300">
             <button
               onClick={() => setViewedBooking(null)}
               className="absolute top-6 right-6 w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-slate-700 transition-colors"
